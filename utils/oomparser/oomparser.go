@@ -18,14 +18,12 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"os/exec"
+	"os"
 	"path"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
-
-	"github.com/google/cadvisor/utils"
-	"github.com/google/cadvisor/utils/tail"
 
 	"github.com/golang/glog"
 )
@@ -38,7 +36,7 @@ var (
 
 // struct to hold file from which we obtain OomInstances
 type OomParser struct {
-	ioreader *bufio.Reader
+	in io.Reader
 }
 
 // struct that contains information related to an OOM kill instance
@@ -101,52 +99,38 @@ func checkIfStartOfOomMessages(line string) bool {
 	return false
 }
 
-// reads the file and sends only complete lines over a channel to analyzeLines.
-// Should prevent EOF errors that occur when lines are read before being fully
-// written to the log. It reads line by line splitting on
-// the "\n" character.
-func readLinesFromFile(lineChannel chan string, ioreader *bufio.Reader) error {
-	linefragment := ""
-	var line string
-	var err error
-	for true {
-		line, err = ioreader.ReadString('\n')
-		if err != nil && err != io.EOF {
-			glog.Errorf("exiting analyzeLinesHelper with error %v", err)
-			close(lineChannel)
-			break
+// StreamOoms reads `/dev/kmsg` for OOM events and parses out the process that
+// was impacted. It returns a stream of events as they occur.
+func (self *OomParser) StreamOoms(outStream chan<- *OomInstance) {
+	scanner := bufio.NewScanner(self.in)
+	for scanner.Scan() {
+		line := scanner.Text()
+		var continuation bool
+		// see https://www.kernel.org/doc/Documentation/ABI/testing/dev-kmsg, strip
+		// the syslog stuff by splitting on the first ;
+		// Technically not required because the regexes don't anchor on the beginning
+		if strings.HasPrefix(line, " ") {
+			// Continuation, technically part of the previous line
+			continuation = true
 		}
-		if line == "" {
-			time.Sleep(100 * time.Millisecond)
-			continue
+		if !continuation {
+			lineParts := strings.SplitN(line, ";", 2)
+			if len(lineParts) < 2 {
+				glog.Warningf("unrecognized kmsg line %q, expected a ';'", line)
+				// Continue anyways, could be fine
+			} else {
+				line = lineParts[1]
+			}
 		}
-		if err == nil {
-			lineChannel <- linefragment + line
-			linefragment = ""
-		} else { // err == io.EOF
-			linefragment += line
-		}
-	}
-	return err
-}
 
-// Calls goroutine for readLinesFromFile, which feeds it complete lines.
-// Lines are checked against a regexp to check for the pid, process name, etc.
-// At the end of an oom message group, StreamOoms adds the new oomInstance to
-// oomLog
-func (self *OomParser) StreamOoms(outStream chan *OomInstance) {
-	lineChannel := make(chan string, 10)
-	go func() {
-		readLinesFromFile(lineChannel, self.ioreader)
-	}()
-
-	for line := range lineChannel {
 		in_oom_kernel_log := checkIfStartOfOomMessages(line)
 		if in_oom_kernel_log {
 			oomCurrentInstance := &OomInstance{
 				ContainerName: "/",
 			}
-			for line := range lineChannel {
+			for scanner.Scan() {
+				line := scanner.Text()
+
 				err := getContainerName(line, oomCurrentInstance)
 				if err != nil {
 					glog.Errorf("%v", err)
@@ -162,71 +146,24 @@ func (self *OomParser) StreamOoms(outStream chan *OomInstance) {
 			outStream <- oomCurrentInstance
 		}
 	}
-	glog.Infof("exiting analyzeLines. OOM events will not be reported.")
+	glog.Warningf("OOMParser exited, OOM events will not be reported.")
 }
 
-func callJournalctl() (io.ReadCloser, error) {
-	cmd := exec.Command("journalctl", "-k", "-f")
-	readcloser, err := cmd.StdoutPipe()
+func newDevKmsgOomParser() (*OomParser, error) {
+	kmsg, err := os.Open("/dev/kmsg")
 	if err != nil {
-		return nil, err
-	}
-	if err := cmd.Start(); err != nil {
-		return nil, err
-	}
-	return readcloser, err
-}
-
-func trySystemd() (*OomParser, error) {
-	readcloser, err := callJournalctl()
-	if err != nil {
-		return nil, err
-	}
-	glog.Infof("oomparser using systemd")
-	return &OomParser{
-		ioreader: bufio.NewReader(readcloser),
-	}, nil
-}
-
-// List of possible kernel log files. These are prioritized in order so that
-// we will use the first one that is available.
-var kernelLogFiles = []string{"/var/log/kern.log", "/var/log/messages", "/var/log/syslog"}
-
-// looks for system files that contain kernel messages and if one is found, sets
-// the systemFile attribute of the OomParser object
-func getLogFile() (string, error) {
-	for _, logFile := range kernelLogFiles {
-		if utils.FileExists(logFile) {
-			glog.Infof("OOM parser using kernel log file: %q", logFile)
-			return logFile, nil
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("'/dev/kmsg' does not exist; unable to parse for OOM events")
 		}
+		return nil, err
 	}
-	return "", fmt.Errorf("unable to find any kernel log file available from our set: %v", kernelLogFiles)
-}
 
-func tryLogFile() (*OomParser, error) {
-	logFile, err := getLogFile()
-	if err != nil {
-		return nil, err
-	}
-	tail, err := tail.NewTail(logFile)
-	if err != nil {
-		return nil, err
-	}
 	return &OomParser{
-		ioreader: bufio.NewReader(tail),
+		in: kmsg,
 	}, nil
 }
 
 // initializes an OomParser object. Returns an OomParser object and an error.
 func New() (*OomParser, error) {
-	parser, err := trySystemd()
-	if err == nil {
-		return parser, nil
-	}
-	parser, err = tryLogFile()
-	if err == nil {
-		return parser, nil
-	}
-	return nil, err
+	return newDevKmsgOomParser()
 }

@@ -148,7 +148,7 @@ func helpTestStreamOoms(oomCheckInstance *OomInstance, sysFile string, t *testin
 
 	select {
 	case oomInstance := <-outStream:
-		if reflect.DeepEqual(*oomCheckInstance, *oomInstance) {
+		if !reflect.DeepEqual(*oomCheckInstance, *oomInstance) {
 			t.Errorf("wrong instance returned. Expected %v and got %v",
 				oomCheckInstance, oomInstance)
 		}
@@ -164,6 +164,6 @@ func mockOomParser(sysFile string, t *testing.T) *OomParser {
 		t.Errorf("had an error opening file: %v", err)
 	}
 	return &OomParser{
-		ioreader: bufio.NewReader(file),
+		in: bufio.NewReader(file),
 	}
 }

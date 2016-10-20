@@ -1,44 +1,44 @@
-Jan  5 15:19:01 CRON[14500]: (root) CMD (touch /var/run/crond.sittercheck)
-Jan  5 15:19:04 cookie_monster[1249]: uid 0, pid 14504, "/var/lib/certs/machine_cert.crt" accessed by exe "/usr/bin/nsscacheclient", cwd "/root", comm "/usr/bin/nsscacheclient"
-Jan  5 15:19:04 cookie_monster[1249]: uid 0, pid 14504, "/var/lib/certs/machine_cert.key" accessed by exe "/usr/bin/nsscacheclient", cwd "/root", comm "/usr/bin/nsscacheclient"
-Jan  5 15:19:05 nsscacheclient[14504]: SUCCESS: Completed run (v29/c20 rtime:0.334299 utime:0.136923 stime:0.011736 maxrss:5260k dials:1 sent:1793 rcvd:5143).
-Jan  5 15:19:27 kernel: [ 5864.708440] memorymonster invoked oom-killer: gfp_mask=0xd0, order=0, oom_score_adj=0
-Jan  5 15:19:27 kernel: [ 5864.708443] memorymonster cpuset=/ mems_allowed=0
-Jan  5 15:19:27 kernel: [ 5864.708446] CPU: 5 PID: 13536 Comm: memorymonster Tainted: P           OX 3.13.0-43-generic #72-Ubuntu
-Jan  5 15:19:27 kernel: [ 5864.708447] Hardware name: Hewlett-Packard HP Z420 Workstation/1589, BIOS J61 v03.65 12/19/2013
-Jan  5 15:19:27 kernel: [ 5864.708448]  ffff88072ae10800 ffff8807a4835c48 ffffffff81720bf6 ffff8807a8e86000
-Jan  5 15:19:27 kernel: [ 5864.708451]  ffff8807a4835cd0 ffffffff8171b4b1 0000000000000246 ffff88072ae10800
-Jan  5 15:19:27 kernel: [ 5864.708453]  ffff8807a4835c90 ffff8807a4835ca0 ffffffff811522a7 0000000000000001
-Jan  5 15:19:27 kernel: [ 5864.708455] Call Trace:
-Jan  5 15:19:27 kernel: [ 5864.708460]  [<ffffffff81720bf6>] dump_stack+0x45/0x56
-Jan  5 15:19:27 kernel: [ 5864.708463]  [<ffffffff8171b4b1>] dump_header+0x7f/0x1f1
-Jan  5 15:19:27 kernel: [ 5864.708465]  [<ffffffff811522a7>] ? find_lock_task_mm+0x27/0x70
-Jan  5 15:19:27 kernel: [ 5864.708467]  [<ffffffff811526de>] oom_kill_process+0x1ce/0x330
-Jan  5 15:19:27 kernel: [ 5864.708470]  [<ffffffff812d6ce5>] ? security_capable_noaudit+0x15/0x20
-Jan  5 15:19:27 kernel: [ 5864.708474]  [<ffffffff811b491c>] mem_cgroup_oom_synchronize+0x51c/0x560
-Jan  5 15:19:27 kernel: [ 5864.708476]  [<ffffffff811b3e50>] ? mem_cgroup_charge_common+0xa0/0xa0
-Jan  5 15:19:27 kernel: [ 5864.708478]  [<ffffffff81152e64>] pagefault_out_of_memory+0x14/0x80
-Jan  5 15:19:27 kernel: [ 5864.708480]  [<ffffffff81719aa1>] mm_fault_error+0x8e/0x180
-Jan  5 15:19:27 kernel: [ 5864.708482]  [<ffffffff8172cf31>] __do_page_fault+0x4a1/0x560
-Jan  5 15:19:27 kernel: [ 5864.708485]  [<ffffffff810a0255>] ? set_next_entity+0x95/0xb0
-Jan  5 15:19:27 kernel: [ 5864.708489]  [<ffffffff81012609>] ? __switch_to+0x169/0x4c0
-Jan  5 15:19:27 kernel: [ 5864.708490]  [<ffffffff8172d00a>] do_page_fault+0x1a/0x70
-Jan  5 15:19:27 kernel: [ 5864.708492]  [<ffffffff81729468>] page_fault+0x28/0x30
-Jan  5 15:19:27 kernel: [ 5864.708493] Task in /mem2 killed as a result of limit of /mem2
-Jan  5 15:19:27 kernel: [ 5864.708495] memory: usage 980kB, limit 980kB, failcnt 4152239
-Jan  5 15:19:27 kernel: [ 5864.708495] memory+swap: usage 0kB, limit 18014398509481983kB, failcnt 0
-Jan  5 15:19:27 kernel: [ 5864.708496] kmem: usage 0kB, limit 18014398509481983kB, failcnt 0
-Jan  5 15:19:27 kernel: [ 5864.708497] Memory cgroup stats for /mem2: cache:0KB rss:980KB rss_huge:0KB mapped_file:0KB writeback:20KB inactive_anon:560KB active_anon:420KB inactive_file:0KB active_file:0KB unevictable:0KB
-Jan  5 15:19:27 kernel: [ 5864.708505] [ pid ]   uid  tgid total_vm      rss nr_ptes swapents oom_score_adj name
-Jan  5 15:19:27 kernel: [ 5864.708600] [13536] 275858 13536  8389663      343   16267  8324326             0 memorymonster
-Jan  5 15:19:27 kernel: [ 5864.708607] Memory cgroup out of memory: Kill process 13536 (memorymonster) score 996 or sacrifice child
-Jan  5 15:19:27 kernel: [ 5864.708608] Killed process 13536 (memorymonster) total-vm:33558652kB, anon-rss:920kB, file-rss:452kB
-Jan  5 15:20:01 CRON[14608]: (root) CMD (touch /var/run/crond.sittercheck)
-Jan  5 15:20:01 CRON[14609]: (root) CMD (/usr/bin/alarm 6000 /usr/share/update-notifier/reevaluate.py)
-Jan  5 15:20:01 CRON[14610]: (root) CMD (/usr/bin/corp_cronwrap -j 80 -t 600 -A -K -L -l 'nsscache-client' /usr/bin/nsscacheclient all)
-Jan  5 15:20:01 /usr/bin/lock: called by /bin/bash for . uid 0, euid 0.
-Jan  5 15:21:01 CRON[14639]: (root) CMD (touch /var/run/crond.sittercheck)
-Jan  5 15:21:05 cookie_monster[1249]: uid 0, pid 14643, "/var/lib/certs/machine_cert.crt" accessed by exe "/usr/bin/nsscacheclient", cwd "/root", comm "/usr/bin/nsscacheclient"
-Jan  5 15:21:05 cookie_monster[1249]: uid 0, pid 14643, "/var/lib/certs/machine_cert.key" accessed by exe "/usr/bin/nsscacheclient", cwd "/root", comm "/usr/bin/nsscacheclient"
-Jan  5 15:21:05 nsscacheclient[14643]: auto.auto(no change) time:0.042264697000000004 retries:0
-Jan  5 15:21:05 nsscacheclient[14643]: auto.home(63c07d09->8686499b write:3631382) time:0.318774602 retries:0
+6,1485,21846693419,-;IPv6: ADDRCONF(NETDEV_UP): veth7c8b295: link is not ready
+6,1486,21846731736,-;IPv6: ADDRCONF(NETDEV_CHANGE): veth7c8b295: link becomes ready
+6,1487,21846731759,-;docker0: port 2(veth7c8b295) entered blocking state
+6,1488,21846731760,-;docker0: port 2(veth7c8b295) entered forwarding state
+6,1489,21846890446,-;docker0: port 2(veth7c8b295) entered disabled state
+6,1490,21846890815,-;eth0: renamed from vetha2b3fd2
+6,1491,21846930568,-;docker0: port 2(veth7c8b295) entered blocking state
+6,1492,21846930570,-;docker0: port 2(veth7c8b295) entered forwarding state
+4,1493,21847500270,-;sh invoked oom-killer: gfp_mask=0x24000c0(GFP_KERNEL), order=0, oom_score_adj=0
+6,1494,21847500281,-;sh cpuset=66ece93b397d49363ee39316bf5cc85c87f341cd0eee3950988cb1ff5d0c1717 mems_allowed=0
+4,1495,21847500285,-;CPU: 0 PID: 7220 Comm: sh Tainted: G           O    4.8.0-gentoo #2
+4,1496,21847500285,-;Hardware name: LENOVO 20BSCTO1WW/20BSCTO1WW, BIOS N14ET32W (1.10 ) 08/13/2015
+4,1497,21847500286,-; 0000000000000000 ffff880197333ca0 ffffffff8137ad47 ffff880197333d68
+4,1498,21847500288,-; ffff8801bf8db380 ffff880197333d00 ffffffff811261dd 0000000000000003
+4,1499,21847500290,-; 0000000000000000 0000000000000001 0000000000000246 0000000000000202
+4,1500,21847500292,-;Call Trace:
+4,1501,21847500296,-; [<ffffffff8137ad47>] dump_stack+0x4d/0x63
+4,1502,21847500298,-; [<ffffffff811261dd>] dump_header+0x58/0x1c8
+4,1503,21847500301,-; [<ffffffff810e85fe>] oom_kill_process+0x7e/0x362
+4,1504,21847500304,-; [<ffffffff811221a8>] ? mem_cgroup_iter+0x109/0x23e
+4,1505,21847500306,-; [<ffffffff811239dc>] mem_cgroup_out_of_memory+0x241/0x299
+4,1506,21847500308,-; [<ffffffff81124447>] mem_cgroup_oom_synchronize+0x273/0x28c
+4,1507,21847500310,-; [<ffffffff81120839>] ? __mem_cgroup_insert_exceeded+0x76/0x76
+4,1508,21847500312,-; [<ffffffff810e8b46>] pagefault_out_of_memory+0x1f/0x76
+4,1509,21847500314,-; [<ffffffff81038f38>] mm_fault_error+0x56/0x108
+4,1510,21847500316,-; [<ffffffff81039355>] __do_page_fault+0x36b/0x3ee
+4,1511,21847500317,-; [<ffffffff81039405>] do_page_fault+0xc/0xe
+4,1512,21847500319,-; [<ffffffff81560082>] page_fault+0x22/0x30
+6,1513,21847500320,-;Task in /docker/66ece93b397d49363ee39316bf5cc85c87f341cd0eee3950988cb1ff5d0c1717 killed as a result of limit of /docker/66ece93b397d49363ee39316bf5cc85c87f341cd0eee3950988cb1ff5d0c1717
+6,1514,21847500323,-;memory: usage 10240kB, limit 10240kB, failcnt 1432
+6,1515,21847500325,-;memory+swap: usage 20356kB, limit 20480kB, failcnt 2
+6,1516,21847500325,-;kmem: usage 112kB, limit 9007199254740988kB, failcnt 0
+6,1517,21847500326,-;Memory cgroup stats for /docker/66ece93b397d49363ee39316bf5cc85c87f341cd0eee3950988cb1ff5d0c1717: cache:24KB rss:10104KB rss_huge:0KB mapped_file:0KB dirty:0KB writeback:0KB swap:10116KB inactive_anon:5088KB active_anon:5016KB inactive_file:12KB active_file:12KB unevictable:0KB
+6,1518,21847500334,-;[ pid ]   uid  tgid total_vm      rss nr_ptes nr_pmds swapents oom_score_adj name
+6,1519,21847500411,-;[ 7220]     0  7220     9413     2429      16       3     2641             0 sh
+3,1520,21847500421,-;Memory cgroup out of memory: Kill process 7220 (sh) score 993 or sacrifice child
+3,1521,21847500423,-;Killed process 7220 (sh) total-vm:37652kB, anon-rss:9448kB, file-rss:268kB, shmem-rss:0kB
+6,1522,21847616195,-;docker0: port 2(veth7c8b295) entered disabled state
+6,1523,21847616292,-;vetha2b3fd2: renamed from eth0
+6,1524,21847821752,-;docker0: port 2(veth7c8b295) entered blocking state
+6,1525,21847821755,-;docker0: port 2(veth7c8b295) entered forwarding state
+6,1526,21847823635,-;docker0: port 2(veth7c8b295) entered disabled state
+6,1527,21847824534,-;device veth7c8b295 left promiscuous mode
+6,1528,21847824536,-;docker0: port 2(veth7c8b295) entered disabled state

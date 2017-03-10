@@ -28,6 +28,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -36,6 +37,7 @@ import (
 	"github.com/google/cadvisor/devicemapper"
 	dockerutil "github.com/google/cadvisor/utils/docker"
 	zfs "github.com/mistifyio/go-zfs"
+	"github.com/stretchr/powerwalk"
 )
 
 const (
@@ -496,9 +498,10 @@ func GetDirInodeUsage(dir string, timeout time.Duration) (uint64, error) {
 	// this allows us to save space in the inode map below
 	var inodes uint64
 	// dedupedInode stores inodes that could be duplicates (nlink > 1)
+	dedupedInodesLock := &sync.Mutex{}
 	dedupedInodes := map[uint64]struct{}{}
 
-	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	err = powerwalk.WalkLimit(dir, func(path string, info os.FileInfo, err error) error {
 		if os.IsNotExist(err) {
 			// expected if files appear/vanish
 			return nil
@@ -516,12 +519,14 @@ func GetDirInodeUsage(dir string, timeout time.Duration) (uint64, error) {
 		}
 		if s.Nlink > 1 {
 			// Dedupe things that could be hardlinks
+			dedupedInodesLock.Lock()
 			dedupedInodes[s.Ino] = struct{}{}
+			dedupedInodesLock.Unlock()
 		} else {
 			inodes++
 		}
 		return nil
-	})
+	}, 10)
 
 	return inodes + uint64(len(dedupedInodes)), err
 }
